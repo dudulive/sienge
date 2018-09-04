@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Sienge</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container">
+		<br />
+		<div class="row">
+			<div class="col-md-10">
+				<div class="blue">
+					<h2>Sienge é o Software para Construção Civil</h2>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				<label for="distancia-pavimentada">Distância. em rodovia
+					pavimentada</label> <input type="number" class="form-control"
+					id="distancia-pavimentada">
+			</div>
+			<div class="form-group col-md-6">
+				<label for="distancia-nao-pavimentada">Distância. em rodovia
+					não-pavimentada</label> <input type="number" class="form-control"
+					id="distancia-nao-pavimentada">
+			</div>
+			<div class="form-group col-md-6">
+				<label for="carga">Carga transportada</label> <input type="number"
+					class="form-control" id="carga">
+			</div>
+			<div class="form-group col-md-6">
+				<label for="veiculo">Veículo utilizado</label> <select id="veiculo"
+					class="form-control">
+					<option value="0">Caminhão Báu</option>
+					<option value="1">Caminhão Caçamba</option>
+					<option value="2">Carreta</option>
+				</select>
+			</div>
+		</div>
+		<button onclick="calcular()" class="btn btn-primary">Calcular</button>
+		<br />
+		<table class="table" id="tabelaTransporte">
+			<thead>
+				<tr>
+					<th scope="col">Distância. em rodovia pavimentada</th>
+					<th scope="col">Distância. em rodovia não-pavimentada</th>
+					<th scope="col">Carga transportada</th>
+					<th scope="col">Veículo utilizado</th>
+					<th scope="col">Custo do Transporte</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+
+	</div>
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		function calcular() {
+			var transporte = {
+				pesoCarga : $("#carga").val(),
+				distanciaPavimentada : $("#distancia-pavimentada").val(),
+				distanciaNaoPavimentada : $("#distancia-nao-pavimentada").val(),
+				tipoVeiculo : $("#veiculo").val()
+			}
+
+			$.ajax({
+				url : '/api/transporte/custo/',
+				type : 'post',
+				dataType : 'json',
+				contentType : 'application/json',
+				data : JSON.stringify(transporte),
+				success : function(data) {
+					var linha = novaLinha(data);
+					$("#tabelaTransporte > tbody").append(linha);
+					$("#carga").val('');
+					;
+					$("#distancia-pavimentada").val('');
+					$("#distancia-nao-pavimentada").val('');
+					$("#veiculo").val('0');
+				},
+				error : function(xhr, status, error) {
+					alert(xhr);
+				}
+			});
+		}
+
+		function novaLinha(transporte) {
+			var linha = $("<tr scope='row'>");
+			var colunaDistanciaPavimentada = $("<td>").text(
+					transporte.distanciaPavimentada);
+			var colunaDistanciaNaoPavimentada = $("<td>").text(
+					transporte.distanciaNaoPavimentada);
+			var colunaPesoCarga = $("<td>").text(transporte.pesoCarga);
+			var colunaTipoVeiculo = $("<td>").text(transporte.tipoVeiculo);
+			var colunaCusto = $("<td>").text(
+					"R$ " + transporte.custoTransporte.toFixed(2));
+
+			linha.append(colunaDistanciaPavimentada);
+			linha.append(colunaDistanciaNaoPavimentada);
+			linha.append(colunaPesoCarga);
+			linha.append(colunaTipoVeiculo);
+			linha.append(colunaCusto);
+
+			return linha;
+		}
+	</script>
+
+</body>
+</html>
